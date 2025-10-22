@@ -1,0 +1,40 @@
+Componente	Status	Acesso
+🐘 PostgreSQL	🟢 Saudável	localhost:5432
+📦 MinIO (S3)	🟢 Saudável	http://localhost:9001
+⚡ Spark Master	🟢 Rodando	http://localhost:8081
+⚡ Spark Worker	🟢 Rodando	http://localhost:8082
+🗄️ Hive Metastore	🟡 Inicializando	localhost:9083
+🔍 Trino	🟢 Saudável	http://localhost:8085
+🌊 Airflow	🟢 Saudável	http://localhost:8080
+📊 Superset	🟢 Saudável	http://localhost:8088
+
+📋 CREDENCIAIS DE ACESSO - STACK BIG DATA
+================================================
+
+MinIO (Object Storage - S3):
+   URL: http://localhost:9001
+   Usuário: minioadmin
+   Senha: minioadmin123
+   
+Airflow (Orquestração ETL):
+   URL: http://localhost:8080
+   Usuário: airflow
+   Senha: airflow
+   Status: ✅ Usuário criado e verificado
+   
+Superset (BI/Dashboards):
+   URL: http://localhost:8088
+   Usuário: admin
+   Senha: admin
+   Status: ✅ Usuário criado e verificado
+   
+Trino (Query Engine):
+   URL: http://localhost:8085
+   Usuário: trino
+   Senha: (sem senha)
+   
+PostgreSQL (Banco de Dados):
+   Host: localhost:5432
+   Usuário: admin
+   Senha: admin123
+   Databases: airflow, superset, metastore
