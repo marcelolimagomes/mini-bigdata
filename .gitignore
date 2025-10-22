@@ -1,6 +1,5 @@
 # Arquivos e diretórios gerados
 data/
-config/
 *.pyc
 __pycache__/
 .pytest_cache/
