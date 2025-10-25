@@ -1,0 +1,4 @@
+# Superset Database Drivers
+psycopg2-binary>=2.9.0
+trino>=0.328.0
+sqlalchemy-trino>=0.5.0

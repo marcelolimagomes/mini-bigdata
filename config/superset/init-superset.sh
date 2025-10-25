@@ -3,9 +3,13 @@ set -e
 
 echo "🚀 Iniciando configuração do Superset..."
 
-# Instalar driver PostgreSQL
-echo "📦 Instalando psycopg2-binary..."
-pip install psycopg2-binary
+# Instalar drivers de banco de dados
+echo "📦 Instalando drivers de banco de dados..."
+if [ -f /app/pythonpath/requirements.txt ]; then
+    pip install -r /app/pythonpath/requirements.txt
+else
+    pip install psycopg2-binary trino sqlalchemy-trino
+fi
 
 # Upgrade do banco de dados
 echo "🔄 Atualizando banco de dados..."

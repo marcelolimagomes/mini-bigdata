@@ -926,6 +926,7 @@ ports:
 Para problemas mais complexos, consulte:
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Guia completo de solução de problemas
 - **[STORAGE.md](STORAGE.md)** - Problemas relacionados a persistência
+- **[SUPERSET-DRIVERS.md](SUPERSET-DRIVERS.md)** - Configuração de drivers do Superset
 - Issues do projeto no GitHub
 
 ## 🚀 Roadmap e Melhorias Futuras

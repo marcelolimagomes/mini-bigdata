@@ -278,6 +278,7 @@ services:
     volumes:
       - superset-data:/app/superset_home
       - ./config/superset/superset_config.py:/app/pythonpath/superset_config.py
+      - ./config/superset/requirements.txt:/app/pythonpath/requirements.txt
       - ./config/superset/init-superset.sh:/app/init-superset.sh
     command: ["/bin/bash", "/app/init-superset.sh"]
     depends_on:
