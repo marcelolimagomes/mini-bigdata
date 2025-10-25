@@ -14,8 +14,12 @@ RUN cd /usr/lib/trino/plugin/hive && \
     curl -L -o hadoop-auth-${HADOOP_VERSION}.jar \
     https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-auth/${HADOOP_VERSION}/hadoop-auth-${HADOOP_VERSION}.jar
 
+# Copiar configuração Hadoop core-site.xml
+COPY ./core-site.xml /etc/trino/core-site.xml
+
 # Ajustar permissões
-RUN chown -R trino:trino /usr/lib/trino/plugin/hive
+RUN chown -R trino:trino /usr/lib/trino/plugin/hive && \
+    chown trino:trino /etc/trino/core-site.xml
 
 USER trino
 
