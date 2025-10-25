@@ -31,25 +31,83 @@ O container Trino customizado (`mini-bigdata-trino:435-s3a`) inclui:
 
 ## ⚙️ Configuração
 
-### Catálogo Hive (`config/trino/catalog/hive.properties`)
+### Arquivos de Configuração
+
+O suporte S3A é configurado através de dois arquivos:
+
+#### 1. Catálogo Hive (`config/trino/catalog/hive.properties`)
 
 ```properties
-# Protocolo S3 nativo
+connector.name=hive
+hive.metastore.uri=thrift://hive-metastore:9083
+
+# Configurações S3/MinIO - Suporte s3:// e s3a://
 hive.s3.endpoint=http://minio:9000
 hive.s3.path-style-access=true
 hive.s3.aws-access-key=minioadmin
 hive.s3.aws-secret-key=minioadmin123
 hive.s3.ssl.enabled=false
 
-# Protocolo S3A (Hadoop)
-hive.s3.fs.impl=org.apache.hadoop.fs.s3a.S3AFileSystem
-fs.s3a.endpoint=http://minio:9000
-fs.s3a.access.key=minioadmin
-fs.s3a.secret.key=minioadmin123
-fs.s3a.path.style.access=true
-fs.s3a.connection.ssl.enabled=false
-fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem
+# Habilitar FileSystem nativo do Hadoop para S3A
+hive.config.resources=/etc/trino/core-site.xml
+
+# Permissões de escrita
+hive.non-managed-table-writes-enabled=true
+hive.allow-drop-table=true
 ```
+
+#### 2. Configuração Hadoop (`config/trino/core-site.xml`)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- S3A FileSystem Implementation -->
+    <property>
+        <name>fs.s3a.impl</name>
+        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+    </property>
+
+    <!-- MinIO Endpoint -->
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>http://minio:9000</value>
+    </property>
+
+    <!-- Credenciais -->
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value>minioadmin</value>
+    </property>
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value>minioadmin123</value>
+    </property>
+
+    <!-- Path Style Access -->
+    <property>
+        <name>fs.s3a.path.style.access</name>
+        <value>true</value>
+    </property>
+
+    <!-- SSL Desabilitado para MinIO local -->
+    <property>
+        <name>fs.s3a.connection.ssl.enabled</name>
+        <value>false</value>
+    </property>
+
+    <!-- Performance tuning -->
+    <property>
+        <name>fs.s3a.fast.upload</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>fs.s3a.multipart.size</name>
+        <value>104857600</value> <!-- 100MB -->
+    </property>
+</configuration>
+```
+
+> ⚠️ **Importante**: As configurações S3A devem estar no `core-site.xml`, **não** no `hive.properties`. Propriedades como `fs.s3a.*` não são reconhecidas diretamente pelo Trino e causarão erro "Configuration property was not used".
 
 ## 💡 Exemplos de Uso
 
@@ -184,9 +242,21 @@ Se precisar rebuildar o Trino com novos JARs:
 
 ## 🐛 Troubleshooting
 
+### Erro: "Configuration property 'fs.s3a.*' was not used"
+
+❌ **Causa**: Propriedades S3A colocadas diretamente no `hive.properties`
+
+✅ **Solução**: Mover propriedades `fs.s3a.*` para `core-site.xml` e referenciar via:
+```properties
+hive.config.resources=/etc/trino/core-site.xml
+```
+
 ### Erro: "No FileSystem for scheme: s3a"
 
-✅ **Solução**: Rebuildar o Trino com `./scripts/shell/rebuild-trino.sh`
+✅ **Solução**: 
+1. Verificar se JARs Hadoop estão instalados: `docker compose exec trino sh -c "ls /usr/lib/trino/plugin/hive/ | grep hadoop"`
+2. Rebuildar Trino: `./scripts/shell/rebuild-trino.sh`
+3. Verificar se `core-site.xml` está sendo copiado no Dockerfile
 
 ### Erro: "Access Denied" ou "403 Forbidden"
 
