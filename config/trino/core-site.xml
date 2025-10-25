@@ -1,80 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <configuration>
-    <!-- S3A FileSystem Implementation -->
-    <property>
-        <name>fs.s3a.impl</name>
-        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
-        <description>S3A FileSystem implementation class</description>
-    </property>
+	<!-- S3A FileSystem Implementation -->
+	<property>
+		<name>fs.s3a.impl</name>
+		<value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+		<description>S3A FileSystem implementation class</description>
+	</property>
 
-    <!-- MinIO Endpoint -->
-    <property>
-        <name>fs.s3a.endpoint</name>
-        <value>http://minio:9000</value>
-        <description>MinIO endpoint URL</description>
-    </property>
+	<!-- MinIO Endpoint -->
+	<property>
+		<name>fs.s3a.endpoint</name>
+		<value>http://minio:9000</value>
+		<description>MinIO endpoint URL</description>
+	</property>
 
-    <!-- Access Key -->
-    <property>
-        <name>fs.s3a.access.key</name>
-        <value>minioadmin</value>
-        <description>AWS/MinIO access key</description>
-    </property>
+	<!-- Access Key -->
+	<property>
+		<name>fs.s3a.access.key</name>
+		<value>minioadmin</value>
+		<description>AWS/MinIO access key</description>
+	</property>
 
-    <!-- Secret Key -->
-    <property>
-        <name>fs.s3a.secret.key</name>
-        <value>minioadmin123</value>
-        <description>AWS/MinIO secret key</description>
-    </property>
+	<!-- Secret Key -->
+	<property>
+		<name>fs.s3a.secret.key</name>
+		<value>minioadmin123</value>
+		<description>AWS/MinIO secret key</description>
+	</property>
 
-    <!-- Path Style Access -->
-    <property>
-        <name>fs.s3a.path.style.access</name>
-        <value>true</value>
-        <description>Enable path-style access for MinIO</description>
-    </property>
+	<!-- Path Style Access -->
+	<property>
+		<name>fs.s3a.path.style.access</name>
+		<value>true</value>
+		<description>Enable path-style access for MinIO</description>
+	</property>
 
-    <!-- SSL Configuration -->
-    <property>
-        <name>fs.s3a.connection.ssl.enabled</name>
-        <value>false</value>
-        <description>Disable SSL for local MinIO</description>
-    </property>
+	<!-- SSL Configuration -->
+	<property>
+		<name>fs.s3a.connection.ssl.enabled</name>
+		<value>false</value>
+		<description>Disable SSL for local MinIO</description>
+	</property>
 
-    <!-- Connection Settings -->
-    <property>
-        <name>fs.s3a.connection.maximum</name>
-        <value>100</value>
-        <description>Maximum number of concurrent connections</description>
-    </property>
+	<!-- Connection Settings -->
+	<property>
+		<name>fs.s3a.connection.maximum</name>
+		<value>100</value>
+		<description>Maximum number of concurrent connections</description>
+	</property>
 
-    <!-- Fast Upload -->
-    <property>
-        <name>fs.s3a.fast.upload</name>
-        <value>true</value>
-        <description>Enable fast upload using disk buffering</description>
-    </property>
+	<!-- Fast Upload -->
+	<property>
+		<name>fs.s3a.fast.upload</name>
+		<value>true</value>
+		<description>Enable fast upload using disk buffering</description>
+	</property>
 
-    <!-- Buffer Directory -->
-    <property>
-        <name>fs.s3a.buffer.dir</name>
-        <value>/tmp/s3a</value>
-        <description>Directory for buffering uploads</description>
-    </property>
+	<!-- Buffer Directory -->
+	<property>
+		<name>fs.s3a.buffer.dir</name>
+		<value>/tmp/s3a</value>
+		<description>Directory for buffering uploads</description>
+	</property>
 
-    <!-- Multipart Upload -->
-    <property>
-        <name>fs.s3a.multipart.size</name>
-        <value>104857600</value>
-        <description>Size of each part for multipart uploads (100MB)</description>
-    </property>
+	<!-- Multipart Upload -->
+	<property>
+		<name>fs.s3a.multipart.size</name>
+		<value>104857600</value>
+		<description>Size of each part for multipart uploads (100MB)</description>
+	</property>
 
-    <!-- Block Size -->
-    <property>
-        <name>fs.s3a.block.size</name>
-        <value>134217728</value>
-        <description>Block size for S3A (128MB)</description>
-    </property>
+	<!-- Block Size -->
+	<property>
+		<name>fs.s3a.block.size</name>
+		<value>134217728</value>
+		<description>Block size for S3A (128MB)</description>
+	</property>
 </configuration>
