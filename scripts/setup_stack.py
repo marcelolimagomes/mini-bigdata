@@ -33,24 +33,30 @@ def run_script(script_path, description):
         return False
 
 
-def check_dependencies():
-    """Verifica e instala dependências"""
-    print("📦 Verificando dependências Python...\n")
-
-    dependencies = [
-        "minio",
-        "trino",
-        "requests"
-    ]
-
-    for dep in dependencies:
+def install_dependencies():
+    """Instala dependências Python necessárias"""
+    print("\n" + "=" * 70)
+    print("📦 Verificando dependências Python...")
+    print("=" * 70 + "\n")
+    
+    required_packages = {
+        'minio': 'minio',
+        'trino': 'trino',
+        'requests': 'requests'
+    }
+    
+    for package_import, package_name in required_packages.items():
         try:
-            __import__(dep)
-            print(f"  ✅ {dep}")
+            __import__(package_import)
+            print(f"  ✅ {package_name}")
         except ImportError:
-            print(f"  📥 Instalando {dep}...")
-            subprocess.run([sys.executable, "-m", "pip", "install", dep, "-q"])
-            print(f"  ✅ {dep} instalado")
+            print(f"  📥 Instalando {package_name}...")
+            subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', '--quiet', package_name],
+                check=True,
+                capture_output=True
+            )
+            print(f"  ✅ {package_name} instalado")
 
 
 def main():
@@ -64,10 +70,12 @@ def main():
     print("    3. Superset (database connections e datasets)")
     print("\n" + "=" * 70)
 
-    input("\n⏸️  Pressione ENTER para continuar...")
+    # Modo automático - não pedir confirmação se rodando via script
+    if "--auto" not in sys.argv:
+        input("\n⏸️  Pressione ENTER para continuar...")
 
     # Verificar dependências
-    check_dependencies()
+    install_dependencies()
 
     # Determinar diretório dos scripts
     script_dir = os.path.dirname(os.path.abspath(__file__))

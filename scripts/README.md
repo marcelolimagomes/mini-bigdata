@@ -11,14 +11,42 @@ pip install minio trino requests
 
 ## 🚀 Uso Rápido
 
-### Opção 1: Setup Completo (Recomendado)
+### Opção 1: Setup Completo do Zero (RECOMENDADO)
+
+**Para iniciar toda a stack do zero (inclui criação de diretórios, build, deploy e configuração):**
 
 ```bash
-# Executar configuração completa de uma vez
+# Opção A: Script Bash (recomendado para Linux/Mac)
+./scripts/shell/full-setup.sh
+
+# Opção B: Script Python (cross-platform)
+python3 scripts/full_setup.py
+```
+
+Estes scripts executam TODAS as etapas automaticamente:
+1. ✅ Criam estrutura de diretórios em `/media/marcelo/dados1/bigdata-docker`
+2. ✅ Limpam ambiente Docker (containers, volumes, redes antigas)
+3. ✅ Fazem build das imagens personalizadas (Hive, Trino)
+4. ✅ Sobem serviços base (PostgreSQL, MinIO, Redis)
+5. ✅ Sobem Hive Metastore
+6. ✅ Sobem demais serviços (Spark, Trino, Airflow, Superset)
+7. ✅ Validam todos os serviços
+8. ✅ Configuram MinIO (buckets), Trino (schemas/tabelas) e Superset (datasets)
+
+**Tempo estimado:** 5-10 minutos
+
+---
+
+### Opção 2: Apenas Configuração (stack já rodando)
+
+**Se a stack já está rodando e você quer apenas configurar os serviços:**
+
+```bash
+# Executar configuração completa
 python3 scripts/setup_stack.py
 ```
 
-Este script executa todos os passos na ordem correta:
+Este script executa apenas as configurações:
 1. Configura buckets no MinIO
 2. Cria schemas e tabelas no Trino/Hive
 3. Configura datasets no Superset

@@ -34,13 +34,14 @@ Fornecer um ambiente Big Data **totalmente funcional** que pode ser executado em
 
 ### ⚡ Características
 
+- ✅ **Setup Automatizado**: 1 comando para configurar tudo (~8 minutos)
 - ✅ **Arquitetura Completa**: Storage, processamento, catálogo, orquestração e visualização
 - ✅ **Totalmente Containerizado**: Infraestrutura como código com Docker Compose
 - ✅ **Production-Ready**: Mesmas tecnologias usadas em ambientes corporativos
 - ✅ **S3-Compatible**: Utiliza MinIO como alternativa local ao AWS S3
 - ✅ **Integração Nativa**: Todos os componentes comunicam-se nativamente
 - ✅ **Persistência de Dados**: Dados salvos em disco externo para segurança
-- ✅ **Fácil Setup**: Scripts automatizados para configuração inicial
+- ✅ **Validação Automática**: Scripts de validação de todos os serviços
 
 ## �️ Componentes
 
@@ -152,46 +153,61 @@ Antes de iniciar, certifique-se de ter:
 
 - **Docker** >= 20.10 ([Instalar](https://docs.docker.com/engine/install/))
 - **Docker Compose** >= 2.0 ([Instalar](https://docs.docker.com/compose/install/))
+- **Python 3** >= 3.8 (para scripts de automação)
 - **Recursos Mínimos**:
   - 8GB RAM disponível
   - 20GB espaço em disco
   - CPU com 4+ cores (recomendado)
-- **Portas Livres**: 5432, 7077, 8080-8088, 9000-9001, 9083
+- **Portas Livres**: 5432, 6379, 7077, 8080-8088, 9000-9001, 9083
 
-### 🔧 Instalação
+### ⚡ Setup Automatizado (Recomendado)
 
-**1. Clone o repositório**
+**Opção 1: Setup completo com 1 comando** 🎯
 
 ```bash
+# Clonar repositório
 git clone https://github.com/marcelolimagomes/mini-bigdata.git
 cd mini-bigdata
+
+# Executar setup automatizado
+python3 scripts/full_setup.py
 ```
 
-**2. Configurar ambiente Python (opcional, mas recomendado)**
+**Tempo estimado:** ~8 minutos  
+**O que faz:**
+- ✅ Cria estrutura de diretórios
+- ✅ Limpa ambiente Docker
+- ✅ Constrói imagens personalizadas
+- ✅ Inicia todos os serviços em ordem
+- ✅ Valida health checks
+- ✅ Configura MinIO, Trino e Superset
+
+**Opção 2: Script Shell** (alternativa)
 
 ```bash
-# Criar ambiente virtual Python
-python3 -m venv .venv
-
-# Ativar ambiente virtual
-source .venv/bin/activate
-
-# Instalar dependências
-pip install -r requirements.txt
+./scripts/shell/full-setup.sh
 ```
 
-> 💡 **Dica**: O ambiente virtual é necessário apenas se você pretende executar os scripts Python de validação e testes. Os containers Docker funcionam independentemente.
+### 🔧 Setup Manual (Avançado)
 
-**3. Configure o ambiente Docker**
+Se preferir ter mais controle sobre o processo:
+
+**1. Criar estrutura de diretórios**
 
 ```bash
-# Executar script de setup inicial
-./scripts/shell/setup.sh
+sudo mkdir -p /media/marcelo/dados1/bigdata-docker/{postgres,minio,hive,trino,superset,redis,airflow/{dags,logs,plugins},spark/{master,worker}}
+sudo chmod -R 755 /media/marcelo/dados1/bigdata-docker
 ```
 
-> ⚠️ **Nota**: O script `setup.sh` criará automaticamente a estrutura de diretórios em `/media/marcelo/dados1/bigdata-docker/`. Ajuste o caminho no script se necessário.
+> ⚠️ **Nota**: Ajuste o caminho `/media/marcelo/dados1/bigdata-docker` se necessário no arquivo `docker-compose.yml`.
 
-**4. Inicie os serviços**
+**2. Construir imagens personalizadas**
+
+```bash
+docker compose build hive-metastore trino
+```
+
+**3. Iniciar serviços**
 
 ```bash
 # Iniciar todos os containers em background
