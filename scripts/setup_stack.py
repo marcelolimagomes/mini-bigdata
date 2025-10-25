@@ -38,25 +38,38 @@ def install_dependencies():
     print("\n" + "=" * 70)
     print("📦 Verificando dependências Python...")
     print("=" * 70 + "\n")
-    
+
     required_packages = {
         'minio': 'minio',
         'trino': 'trino',
         'requests': 'requests'
     }
-    
+
     for package_import, package_name in required_packages.items():
         try:
             __import__(package_import)
             print(f"  ✅ {package_name}")
         except ImportError:
             print(f"  📥 Instalando {package_name}...")
-            subprocess.run(
-                [sys.executable, '-m', 'pip', 'install', '--quiet', package_name],
-                check=True,
-                capture_output=True
-            )
-            print(f"  ✅ {package_name} instalado")
+            try:
+                # Tentar instalar com pip
+                result = subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install', '--user', '--quiet', package_name],
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+                if result.returncode == 0:
+                    print(f"  ✅ {package_name} instalado")
+                else:
+                    print(f"  ⚠️  Não foi possível instalar {package_name}")
+                    print(f"  💡 Instale manualmente: pip install --user {package_name}")
+            except subprocess.TimeoutExpired:
+                print(f"  ⚠️  Timeout ao instalar {package_name}")
+                print(f"  💡 Instale manualmente: pip install --user {package_name}")
+            except Exception as e:
+                print(f"  ⚠️  Erro ao instalar {package_name}: {e}")
+                print(f"  💡 Instale manualmente: pip install --user {package_name}")
 
 
 def main():
