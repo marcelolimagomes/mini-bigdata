@@ -1,4 +1,44 @@
-# Superset Database Drivers
+# ========================================
+# Apache Superset 4.1.4 - Drivers Essenciais
+# ========================================
+#
+# NOTA: Este arquivo contém apenas os drivers essenciais
+# para evitar conflitos de dependências com o Superset 4.1.4
+#
+
+# -----------------------------------------
+# Database Drivers Essenciais
+# -----------------------------------------
+
+# PostgreSQL
 psycopg2-binary>=2.9.0
+
+# Trino (Presto SQL)
 trino>=0.328.0
 sqlalchemy-trino>=0.5.0
+
+# MySQL / MariaDB (usando PyMySQL - puro Python, sem necessidade de compilação)
+pymysql>=1.1.0
+
+# -----------------------------------------
+# Cache & Message Broker
+# -----------------------------------------
+
+# Redis
+redis>=5.0.0
+hiredis>=2.3.0
+
+# -----------------------------------------
+# Image Processing & PDFs
+# -----------------------------------------
+
+# Pillow para screenshots, relatórios e PDFs
+pillow>=10.0.0
+
+# -----------------------------------------
+# Async Processing
+# -----------------------------------------
+
+# Celery (já vem instalado no Superset)
+# celery>=5.3.0
+

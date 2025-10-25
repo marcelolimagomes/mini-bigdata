@@ -257,9 +257,27 @@ services:
       _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_USER}
       _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_PASSWORD}
 
+  # Redis - Cache e message broker para Superset
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - bigdata-network
+
   # Apache Superset - BI e Dashboards
   superset:
-    image: apache/superset:3.0.1
+    image: apache/superset:4.1.4
     container_name: superset
     environment:
       SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
@@ -273,6 +291,10 @@ services:
       SUPERSET_ADMIN_USER: ${SUPERSET_ADMIN_USER}
       SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
       SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Suprimir warnings conhecidos do Python
+      PYTHONWARNINGS: "ignore::DeprecationWarning"
     ports:
       - "8088:8088"
     volumes:
@@ -283,6 +305,8 @@ services:
     command: ["/bin/bash", "/app/init-superset.sh"]
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
     networks:
@@ -364,3 +388,10 @@ volumes:
       type: none
       o: bind
       device: /media/marcelo/dados1/bigdata-docker/superset
+
+  redis-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/marcelo/dados1/bigdata-docker/redis

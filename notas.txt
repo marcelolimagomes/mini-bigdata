@@ -1,0 +1,24 @@
+docker run -it --rm \
+  -v superset_home:/app/superset_home \
+  -v superset_db:/var/lib/superset \
+  -e SUPERSET_SECRET_KEY='adsfhlajsdhflasjdhflsdjf982r23rbas98df34jrba9ds8f4jrlabsdf983rljaksdhf983n2rjkasd98f' \
+  apache/superset:4.1.4 superset fab create-admin \
+  --username admin \
+  --firstname Superset \
+  --lastname Admin \
+  --email admin@example.com \
+  --password admin
+
+  docker run -it --rm \
+  -v superset_home:/app/superset_home \
+  -v superset_db:/var/lib/superset \
+  -e SUPERSET_SECRET_KEY='adsfhlajsdhflasjdhflsdjf982r23rbas98df34jrba9ds8f4jrlabsdf983rljaksdhf983n2rjkasd98f' \
+  apache/superset:4.1.4 superset load_examples
+
+  docker run -d \
+  --name superset \
+  -p 8088:8088 \
+  -v superset_home:/app/superset_home \
+  -v superset_db:/var/lib/superset \
+  -e SUPERSET_SECRET_KEY='adsfhlajsdhflasjdhflsdjf982r23rbas98df34jrba9ds8f4jrlabsdf983rljaksdhf983n2rjkasd98f' \
+  apache/superset:4.1.4

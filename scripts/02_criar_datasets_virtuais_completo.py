@@ -33,7 +33,6 @@ class SupersetAPI:
         self.password = password
         self.session = requests.Session()
         self.access_token = None
-        self.csrf_token = None
 
     def login(self) -> bool:
         """Faz login no Superset e obtém tokens"""
@@ -58,27 +57,7 @@ class SupersetAPI:
                     "Authorization": f"Bearer {self.access_token}",
                     "Content-Type": "application/json"
                 })
-
-                # Obter CSRF token após login
-                csrf_response = self.session.get(
-                    f"{self.url}/api/v1/security/csrf_token/",
-                    headers={"Authorization": f"Bearer {self.access_token}"}
-                )
-
-                if csrf_response.status_code == 200:
-                    self.csrf_token = csrf_response.json().get("result")
-                    if self.csrf_token:
-                        # Atualizar headers e cookies com CSRF token
-                        self.session.headers.update({
-                            "X-CSRFToken": self.csrf_token,
-                            "Referer": self.url
-                        })
-                        self.session.cookies.set("csrf_access_token", self.csrf_token)
-                        self.session.cookies.set("csrf_refresh_token", self.csrf_token)
-                        print(f"✅ Login realizado com sucesso")
-                        return True
-
-                print(f"⚠️  CSRF token não obtido, mas login OK")
+                print(f"✅ Login realizado com sucesso")
                 return True
             else:
                 print(f"❌ Falha no login: {response.status_code}")
@@ -88,32 +67,6 @@ class SupersetAPI:
         except Exception as e:
             print(f"❌ Erro ao fazer login: {e}")
             return False
-
-    def get_csrf_token(self) -> Optional[str]:
-        """Obtém CSRF token para requisições POST/PUT"""
-        try:
-            response = self.session.get(
-                f"{self.url}/api/v1/security/csrf_token/",
-                headers={"Authorization": f"Bearer {self.access_token}"}
-            )
-
-            if response.status_code == 200:
-                result = response.json().get("result")
-                if result:
-                    self.csrf_token = result
-                    # Atualizar headers com CSRF token
-                    self.session.headers.update({
-                        "X-CSRFToken": self.csrf_token,
-                        "Referer": self.url
-                    })
-                    # Atualizar cookies
-                    self.session.cookies.set("csrf_access_token", self.csrf_token)
-                    self.session.cookies.set("csrf_refresh_token", self.csrf_token)
-                    return self.csrf_token
-            return None
-        except Exception as e:
-            print(f"⚠️  Erro ao obter CSRF token: {e}")
-            return None
 
     def get_databases(self) -> list:
         """Lista todos os databases"""
@@ -129,22 +82,9 @@ class SupersetAPI:
     def create_dataset(self, dataset_data: Dict) -> Optional[int]:
         """Cria um dataset virtual"""
         try:
-            # Sempre obter CSRF token fresco antes de criar dataset
-            if not self.csrf_token:
-                self.get_csrf_token()
-
-            # Garantir que headers estão corretos
-            headers = {
-                "Authorization": f"Bearer {self.access_token}",
-                "Content-Type": "application/json",
-                "X-CSRFToken": self.csrf_token,
-                "Referer": self.url
-            }
-
             response = self.session.post(
                 f"{self.url}/api/v1/dataset/",
-                json=dataset_data,
-                headers=headers
+                json=dataset_data
             )
 
             if response.status_code == 201:
@@ -254,26 +194,6 @@ def main():
         print("\n❌ Falha no login. Verifique as credenciais.")
         print("   Tente acessar http://localhost:8088 manualmente")
         sys.exit(1)
-
-    # Verificar se CSRF token foi obtido
-    if not api.csrf_token:
-        print("\n⚠️  CSRF token não foi obtido durante login.")
-        print("   Tentando obter CSRF token separadamente...")
-        api.get_csrf_token()
-
-        if not api.csrf_token:
-            print("\n❌ Não foi possível obter CSRF token.")
-            print("\n💡 SOLUÇÃO ALTERNATIVA:")
-            print("   A API do Superset requer CSRF token que não está disponível.")
-            print("   Use a interface web do Superset para criar datasets manualmente:")
-            print(f"\n   1. Acesse: {SUPERSET_URL}")
-            print("   2. Data → Datasets → + Dataset")
-            print("   3. Selecione 'Create dataset from SQL query'")
-            print(f"   4. Cole o SQL de cada arquivo em: {SQL_DIR}")
-            print("\n   OU execute via superset CLI no container:")
-            print("   docker exec -it superset bash")
-            print("   superset fab create-dataset --help")
-            sys.exit(1)
 
     # Listar databases para confirmar ID
     print("\n📊 Buscando databases disponíveis...")
