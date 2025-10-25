@@ -96,6 +96,17 @@ Documentação completa para desenvolvimento de pipelines ETL e dashboards BI.
 
 ---
 
+### 9️⃣ [Configuração Automatizada via API](./09-configuracao-automatizada.md)
+- Scripts Python para automação completa
+- Configuração do MinIO (buckets)
+- Configuração do Trino (schemas e tabelas)
+- Configuração do Superset (datasets)
+- Script mestre all-in-one
+- Validação automatizada
+- **Tempo:** 30 minutos - 1 hora
+
+---
+
 ## 🎓 Trilhas de Aprendizado Recomendadas
 
 ### 👨‍💻 **Desenvolvedor Iniciante**
