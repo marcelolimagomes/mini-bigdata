@@ -175,9 +175,12 @@ services:
     networks:
       - bigdata-network
 
-  # Trino - Query Engine com suporte JDBC/REST
+  # Trino - Query Engine com suporte JDBC/REST e S3A
   trino:
-    image: trinodb/trino:435
+    build:
+      context: ./config/trino
+      dockerfile: Dockerfile
+    image: mini-bigdata-trino:435-s3a
     container_name: trino
     ports:
       - "8085:8080"
