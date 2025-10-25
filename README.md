@@ -47,12 +47,15 @@ Fornecer um ambiente Big Data **totalmente funcional** que pode ser executado em
 | Componente | Tecnologia | Porta | Descrição |
 |------------|-----------|-------|-----------|
 | **Object Storage** | MinIO | 9000, 9001 | Armazenamento S3-compatible para Data Lake |
+| **Cache/Results** | Redis | 6379 | Cache e Results Backend para Superset |
 | **Orquestrador ETL** | Apache Airflow | 8080 | Orquestração de workflows e pipelines |
 | **Processamento** | Apache Spark | 8081, 7077 | Engine de processamento distribuído (PySpark) |
 | **Query Engine** | Trino | 8085 | SQL distribuído com acesso JDBC/REST |
 | **Metastore** | Hive Metastore | 9083 | Catálogo de dados centralizado |
 | **Database** | PostgreSQL | 5432 | Banco relacional para metadados |
 | **BI/Dashboards** | Apache Superset | 8088 | Plataforma de visualização e dashboards |
+
+> 📝 **Nota**: O Apache Superset está configurado com **Redis Results Backend**, permitindo execução de queries SQL via API e armazenamento de resultados temporários.
 
 ## 🏗️ Arquitetura
 
@@ -164,16 +167,31 @@ git clone https://github.com/marcelolimagomes/mini-bigdata.git
 cd mini-bigdata
 ```
 
-**2. Configure o ambiente**
+**2. Configurar ambiente Python (opcional, mas recomendado)**
 
 ```bash
-# Criar estrutura de diretórios e configurações
-./setup.sh
+# Criar ambiente virtual Python
+python3 -m venv .venv
+
+# Ativar ambiente virtual
+source .venv/bin/activate
+
+# Instalar dependências
+pip install -r requirements.txt
+```
+
+> 💡 **Dica**: O ambiente virtual é necessário apenas se você pretende executar os scripts Python de validação e testes. Os containers Docker funcionam independentemente.
+
+**3. Configure o ambiente Docker**
+
+```bash
+# Executar script de setup inicial
+./scripts/shell/setup.sh
 ```
 
 > ⚠️ **Nota**: O script `setup.sh` criará automaticamente a estrutura de diretórios em `/media/marcelo/dados1/bigdata-docker/`. Ajuste o caminho no script se necessário.
 
-**3. Inicie os serviços**
+**4. Inicie os serviços**
 
 ```bash
 # Iniciar todos os containers em background
@@ -193,6 +211,10 @@ O primeiro start pode levar 3-5 minutos. Aguarde até que todos os serviços est
 ```bash
 # Verificar saúde dos containers
 docker-compose ps
+
+# OU validar todos os serviços com script Python
+source .venv/bin/activate  # (se configurou o ambiente virtual)
+python3 scripts/validate_all_services.py
 ```
 
 ### 🌐 Acesso às Interfaces
@@ -240,6 +262,13 @@ Este projeto possui documentação detalhada para cada componente:
 - 📁 **[Catálogo Hive Metastore](docs/06-catalogo-hive-metastore.md)** - Gestão de metadados
 - 🔌 **[APIs REST e JDBC](docs/07-apis-rest-jdbc.md)** - Conectividade externa
 - 💼 **[Casos de Uso Práticos](docs/08-casos-uso-praticos.md)** - Exemplos reais
+- ⚙️ **[Configuração Automatizada](docs/09-configuracao-automatizada.md)** - Scripts de setup
+
+### 📊 Relatórios de Testes e Validação
+
+- 📋 **[Validação API Superset](docs/reports/VALIDACAO_SUPERSET_API.md)** - Testes das APIs REST
+- 📄 **[Relatório Final de Testes](docs/reports/RELATORIO-FINAL-TESTES-API-SUPERSET.md)** - Resultados completos
+- 📖 **[README Testes API](docs/reports/README-TESTES-API-SUPERSET.md)** - Guia de testes
 
 ## 📊 Exemplos Práticos
 
@@ -515,8 +544,7 @@ df.show(10)
 mini-bigdata/
 │
 ├── 📄 docker-compose.yml          # Orquestração de containers
-├── 🔧 setup.sh                    # Script de setup inicial
-├── 📋 requirements.txt            # Dependências Python
+├──  requirements.txt            # Dependências Python
 ├── 📖 README.md                   # Esta documentação
 ├── 📘 QUICKSTART.md              # Guia rápido de início
 ├── 💾 STORAGE.md                 # Detalhes sobre persistência
@@ -538,8 +566,11 @@ mini-bigdata/
 │   ├── postgres/                 # Scripts de inicialização
 │   │   └── init-databases.sh
 │   └── superset/                 # Superset configs
+│       ├── Dockerfile
 │       ├── init-superset.sh
-│       └── superset_config.py
+│       ├── requirements.txt
+│       ├── superset_config.py    # Configuração com Redis results backend
+│       └── README.md
 │
 ├── 📂 data/                       # Volumes Docker (runtime)
 │   ├── airflow/
@@ -559,20 +590,77 @@ mini-bigdata/
 │   ├── 06-catalogo-hive-metastore.md
 │   ├── 07-apis-rest-jdbc.md
 │   ├── 08-casos-uso-praticos.md
+│   ├── 09-configuracao-automatizada.md
 │   ├── INDICE.md
-│   └── senhas.txt                # Credenciais padrão
+│   ├── senhas.txt                # Credenciais padrão
+│   ├── SUPERSET-v5-GUIA.md       # Guia Apache Superset v5
+│   ├── SUPERSET-ARCHITECTURE.md  # Arquitetura do Superset
+│   ├── SUPERSET-EXAMPLES.md      # Exemplos de uso
+│   └── reports/                  # Relatórios de testes e validações
+│       ├── RELATORIO-FINAL-TESTES-API-SUPERSET.md
+│       ├── RELATORIO-TESTES-API-SUPERSET.md
+│       ├── README-TESTES-API-SUPERSET.md
+│       └── VALIDACAO_SUPERSET_API.md
 │
-└── 📂 examples/                   # Exemplos práticos
-    ├── access_examples.py        # Scripts de acesso
-    ├── dags/                     # DAGs Airflow exemplo
-    │   └── etl_sales_pipeline.py
-    ├── jobs/                     # Jobs Spark exemplo
-    │   ├── process_sales.py
-    │   └── aggregate_sales.py
-    ├── queries/                  # Queries SQL exemplo
-    │   └── trino_examples.sql
-    ├── notebooks/                # Jupyter notebooks
-    └── data/                     # Dados de exemplo
+├── 📂 examples/                   # Exemplos práticos
+│   ├── access_examples.py        # Scripts de acesso
+│   ├── automation/               # Automação de tarefas
+│   │   └── exemplo_automacao_superset.py  # Classe SupersetAutomation
+│   ├── dags/                     # DAGs Airflow exemplo
+│   │   └── etl_sales_pipeline.py
+│   ├── jobs/                     # Jobs Spark exemplo
+│   │   ├── process_sales.py
+│   │   └── aggregate_sales.py
+│   ├── queries/                  # Queries SQL exemplo
+│   │   └── trino_examples.sql
+│   ├── notebooks/                # Jupyter notebooks
+│   └── data/                     # Dados de exemplo
+│
+├── 📂 scripts/                    # Scripts de automação
+│   ├── README.md                 # Documentação dos scripts
+│   ├── setup_stack.py            # Setup completo da stack
+│   ├── validate_stack.py         # Validação de serviços individuais
+│   ├── validate_all_services.py  # ⭐ Validação unificada de todos os serviços
+│   ├── configure_minio.py        # Configuração MinIO
+│   ├── configure_superset.py     # Configuração Superset
+│   ├── configure_trino.py        # Configuração Trino
+│   ├── 02_criar_datasets_virtuais_completo.py  # Criação de datasets
+│   └── shell/                    # Scripts shell
+│       ├── setup.sh              # Setup inicial do ambiente
+│       ├── check-storage.sh      # Verificação de storage
+│       ├── validate-superset.sh  # Validação Superset
+│       └── validate-superset-drivers.sh  # Validação drivers
+│
+├── 📂 tests/                      # Testes automatizados
+│   └── superset/                 # Testes API Apache Superset
+│       ├── test_superset_api_complete.py      # Suite completa de testes
+│       ├── test_superset_crud_operations.py   # CRUD databases/datasets
+│       ├── test_superset_sql_queries.py       # Execução SQL via API
+│       ├── test_api_login_final.py
+│       ├── test_csrf_cookies.py
+│       ├── test_csrf_debug.py
+│       ├── test_form_csrf.py
+│       ├── test_session_csrf.py
+│       ├── test_superset_api.py
+│       ├── test_superset_complete.py
+│       ├── test_superset_simple.py
+│       └── test_web_login.py
+│
+└── 📂 sql/                        # Views SQL analíticas
+    ├── 01_vw_consistencia_alocacao.sql
+    ├── 02_vw_horario_trabalho.sql
+    ├── 03_vw_produtividade_horaria.sql
+    ├── 04_vw_sensibilidade_preco.sql
+    ├── 05_vw_vpn_projetos.sql
+    ├── 06_vw_competitividade_salarial.sql
+    ├── 07_vw_kpis_executivo.sql
+    ├── 08_vw_capacidade_detalhada.sql
+    ├── 09_vw_performance_projetos.sql
+    ├── 10_vw_custos_rentabilidade.sql
+    ├── 11_vw_qualidade_bugs.sql
+    ├── 12_vw_sazonalidade_utilizacao.sql
+    ├── 13_vw_ponto_equilibrio.sql
+    └── 14_vw_concentracao_hhi.sql
 ```
 
 ### 💾 Dados Persistidos (Disco Externo)
@@ -588,11 +676,129 @@ mini-bigdata/
 └── superset/      # 📊 Dashboards e configurações
 ```
 
-## 🛠️ Comandos Úteis
+## 📂 Organização de Arquivos
+
+### 🧪 Testes (`tests/`)
+
+Todos os testes automatizados estão organizados em `tests/superset/`:
+- **test_superset_api_complete.py**: Suite completa com 85.7% de sucesso (12/14 testes)
+- **test_superset_crud_operations.py**: Testes CRUD de databases, datasets, charts e dashboards
+- **test_superset_sql_queries.py**: Testes de execução SQL via API (100% sucesso)
+- Outros testes de autenticação e CSRF
+
+### 🔧 Scripts (`scripts/`)
+
+Scripts de automação e configuração:
+
+**Python**:
+- **validate_all_services.py**: ⭐ Validação unificada de todos os 8 serviços da stack
+- **validate_stack.py**: Validação individual de cada serviço
+- **setup_stack.py**: Setup automatizado completo
+- **configure_*.py**: Configuração de MinIO, Superset e Trino
+- **02_criar_datasets_virtuais_completo.py**: Criação automática de datasets
+
+**Shell** (`scripts/shell/`):
+- **setup.sh**: Setup inicial do ambiente e estrutura de diretórios
+- **validate-superset.sh**: Validação específica do Apache Superset
+- **validate-superset-drivers.sh**: Verificação de drivers JDBC/Python
+- **check-storage.sh**: Verificação de persistência e espaço em disco
+
+### 📚 Exemplos (`examples/`)
+
+Exemplos práticos e reutilizáveis:
+
+**Automação** (`examples/automation/`):
+- **exemplo_automacao_superset.py**: Classe `SupersetAutomation` com métodos para:
+  - `create_database()`: Criar conexões de banco de dados
+  - `create_virtual_dataset()`: Criar datasets virtuais (SQL)
+  - `create_chart()`: Criar gráficos
+  - `create_dashboard()`: Criar dashboards
+  - `execute_sql()`: Executar queries SQL via API
+
+**DAGs Airflow** (`examples/dags/`):
+- Pipeline ETL end-to-end com Spark
+
+**Jobs Spark** (`examples/jobs/`):
+- Processamento PySpark (Bronze → Silver → Gold)
+
+### 📖 Documentação (`docs/`)
+
+Documentação completa:
+- Guias de uso de cada componente (01-09)
+- **SUPERSET-v5-GUIA.md**: Guia do Apache Superset v5
+- **reports/**: Relatórios de testes e validações da API
+
+### 🗄️ SQL (`sql/`)
+
+Views analíticas prontas para uso:
+- KPIs executivos, análise de custos, produtividade, etc.
+- 14 views SQL para análises de negócio
 
 ## 🛠️ Comandos Úteis
 
-### 🚀 Gerenciamento do Ambiente
+## 🛠️ Comandos Úteis
+
+### � Validação da Stack
+
+```bash
+# Validar todos os serviços da stack (recomendado)
+source .venv/bin/activate
+python3 scripts/validate_all_services.py
+
+# Saída esperada:
+# ================================
+# VALIDAÇÃO COMPLETA DA STACK MINI-BIGDATA
+# ================================
+# 
+# Serviços Validados: 8
+# Serviços OK: 8
+# Taxa de Sucesso: 100.0%
+# 
+# ✓ PostgreSQL - Databases: airflow, superset, metastore
+# ✓ Redis - Cache operacional
+# ✓ MinIO - Object storage operacional
+# ✓ Hive Metastore - Catálogo de metadados
+# ✓ Spark - Master e Workers operacionais
+# ✓ Trino - Query engine operacional
+# ✓ Airflow - Scheduler e Webserver ativos
+# ✓ Superset - BI Platform com 2 databases configurados
+
+# Validar serviços individuais
+python3 scripts/validate_stack.py
+
+# Validar apenas Superset
+./scripts/shell/validate-superset.sh
+
+# Validar drivers do Superset
+./scripts/shell/validate-superset-drivers.sh
+
+# Verificar storage
+./scripts/shell/check-storage.sh
+```
+
+### 🧪 Executar Testes da API Superset
+
+```bash
+# Ativar ambiente virtual Python
+source .venv/bin/activate
+
+# Instalar dependências (primeira vez)
+pip install -r requirements.txt
+
+# Suite completa de testes
+python3 tests/superset/test_superset_api_complete.py
+
+# Testes de CRUD (Databases, Datasets, Charts, Dashboards)
+python3 tests/superset/test_superset_crud_operations.py
+
+# Testes de execução SQL via API
+python3 tests/superset/test_superset_sql_queries.py
+
+# Exemplo de automação (classe reutilizável)
+python3 examples/automation/exemplo_automacao_superset.py
+```
+
+### �🚀 Gerenciamento do Ambiente
 
 ```bash
 # Iniciar todos os serviços
