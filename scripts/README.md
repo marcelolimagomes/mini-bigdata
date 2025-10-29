@@ -1,6 +1,6 @@
 # 🤖 Scripts de Configuração Automatizada
 
-Scripts Python para configurar automaticamente a stack Big Data via API.
+Scripts Python e Shell para configurar e gerenciar automaticamente a stack Big Data.
 
 ## 📦 Instalação de Dependências
 
@@ -8,6 +8,32 @@ Scripts Python para configurar automaticamente a stack Big Data via API.
 # Instalar todas as dependências necessárias
 pip install minio trino requests
 ```
+
+## 🔄 Recriar Stack do Zero
+
+**Para destruir e recriar toda a stack (apaga TODOS os dados):**
+
+```bash
+# Opção A: Script Bash (Linux/Mac)
+./scripts/shell/recreate-stack.sh
+
+# Opção B: Script Python (Cross-platform)
+python3 scripts/recreate_stack.py
+
+# Opção C: Modo automático (sem confirmações - USE COM CUIDADO!)
+./scripts/shell/recreate-stack.sh --auto
+python3 scripts/recreate_stack.py --auto
+```
+
+⚠️ **ATENÇÃO:** Estes scripts irão:
+- ❌ Parar e remover TODOS os containers
+- ❌ Remover TODOS os volumes Docker
+- ❌ APAGAR todos os dados em `/media/marcelo/dados1/bigdata-docker`
+- ✅ Recriar a estrutura de diretórios
+- ✅ Subir a stack completa novamente
+- ✅ Validar os serviços
+
+---
 
 ## 🚀 Uso Rápido
 
